@@ -1,13 +1,20 @@
-// require('dotenv').config();
-const express = require('express'); // подключаем экспресс
+// работа .env
+require('dotenv').config();
+// подключаем экспресс
+const express = require('express');
+// подключаем монгуст для монго
 const mongoose = require('mongoose');
+// сбоока запросов.ответов
 const bodyParser = require('body-parser');
-// const { celebrate, Joi, errors } = require('celebrate');
+// проверка запросов на валидность
+const { celebrate, Joi, errors } = require('celebrate');
 // const corsUnit = require('cors');
 // const cookieParser = require('cookie-parser');
 // const routerUser = require('./routes/user');
 // const routerCard = require('./routes/card');
-// const { createUser, login, logout } = require('./controllers/users');
+
+// контроллеры Users
+const { createUser, login } = require('./controllers/users');
 // const { authCheck } = require('./middlewares/auth');
 // const { errorsCheck } = require('./middlewares/errors');
 // const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -23,6 +30,15 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 const app = express();
 
 app.use(bodyParser.json());
+
+// создание пользователя в базе;
+app.use('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    name: Joi.string().min(2).max(30),
+    password: Joi.string().required().min(2).max(30),
+  }).unknown(false),
+}), createUser);
 // app.use(cookieParser());
 
 // app.use(corsUnit());
@@ -37,22 +53,12 @@ app.use(bodyParser.json());
 
 // app.use('/signout', logout);
 
-// app.use('/signup', celebrate({
-//   body: Joi.object().keys({
-//     email: Joi.string().required().email(),
-//     password: Joi.string().required().min(2).max(30),
-//     name: Joi.string().min(2).max(30),
-//     about: Joi.string().min(2).max(30),
-//     avatar: Joi.string().pattern(urlPattern),
-//   }).unknown(true),
-// }), createUser);
-
-// app.use('/signin', celebrate({
-//   body: Joi.object().keys({
-//     email: Joi.string().required().email(),
-//     password: Joi.string().required().min(2).max(30),
-//   }).unknown(true),
-// }), login);
+app.use('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(2).max(30),
+  }).unknown(true),
+}), login);
 
 // app.use(authCheck); // проверка авторизации;
 
@@ -67,6 +73,6 @@ app.use(bodyParser.json());
 // app.use(errors()); // обработка ошибок сгенерированных Joi
 
 // app.use(errorsCheck);
-console.log('test111');
+console.log('Сервер запущен');
 app.listen(PORT, () => {
 });
