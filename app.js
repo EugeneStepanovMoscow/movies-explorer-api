@@ -9,15 +9,21 @@ const bodyParser = require('body-parser');
 // проверка запросов на валидность
 const { celebrate, Joi, errors } = require('celebrate');
 // const corsUnit = require('cors');
-// const cookieParser = require('cookie-parser');
-// const routerUser = require('./routes/user');
+const cookieParser = require('cookie-parser');
+
+const pc = require('picocolors');
+// подключение роутов
+const routerUsers = require('./routes/users');
+const routerMovies = require('./routes/movies');
 // const routerCard = require('./routes/card');
 
 // контроллеры Users
-const { createUser, login } = require('./controllers/users');
-// const { authCheck } = require('./middlewares/auth');
-// const { errorsCheck } = require('./middlewares/errors');
-// const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { createUser, login, logout } = require('./controllers/users');
+
+// Middlewares
+const { authCheck } = require('./middlewares/auth');
+const { errorsCheck } = require('./middlewares/errors');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env; // присваиваем номер порта из окружения или 3000 по умолчанию
 
@@ -30,6 +36,7 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 const app = express();
 
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // создание пользователя в базе;
 app.use('/signup', celebrate({
@@ -39,11 +46,10 @@ app.use('/signup', celebrate({
     password: Joi.string().required().min(2).max(30),
   }).unknown(false),
 }), createUser);
-// app.use(cookieParser());
 
 // app.use(corsUnit());
 
-// app.use(requestLogger);
+app.use(requestLogger);
 
 // app.get('/crash-test', () => {
 //   setTimeout(() => {
@@ -60,19 +66,30 @@ app.use('/signin', celebrate({
   }).unknown(true),
 }), login);
 
-// app.use(authCheck); // проверка авторизации;
+app.use('/signout', (req, res) => {
+  console.log(pc.yellow(`Токен удален`));
+  res.clearCookie('jwt').send({ message: 'Вы вышли из приложения, токен удален' });
+});
 
-// app.use('/users', routerUser);
+// проверка авторизации пользователя
+app.use(authCheck);
 
-// app.use('/signout', logout);
+app.use('/users', routerUsers);
+app.use('/movies', routerMovies);
+
+// удаление токена при выходе
+// app.get('/signout', logout);
 
 // app.use('/cards', routerCard);
 
-// app.use(errorLogger); // запись ошибок в лог
+app.use(errorLogger); // запись ошибок в лог
 
-// app.use(errors()); // обработка ошибок сгенерированных Joi
+// обработка ошибок сгенерированных Joi
+app.use(errors());
+app.use(errorsCheck);
 
-// app.use(errorsCheck);
-console.log('Сервер запущен');
+console.log(pc.yellow('Сервер запущен'));
 app.listen(PORT, () => {
 });
+
+

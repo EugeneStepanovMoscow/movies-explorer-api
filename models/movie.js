@@ -43,10 +43,10 @@ const movieSchema = new mongoose.Schema({
     required: true,
   },
   // проверить поле ref
-  movieId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  },
+  // movieId: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   required: true,
+  // },
   // прверить на кирилицу
   nameRU: {
     type: String,
@@ -58,4 +58,4 @@ const movieSchema = new mongoose.Schema({
     required: true,
   },
 });
-module.exports = mongoose.model('movie', movieSchema);
+module.exports = mongoose.model('Movie', movieSchema);
