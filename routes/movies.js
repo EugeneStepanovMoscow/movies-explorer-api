@@ -4,54 +4,44 @@ const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const { getUserMovies, saveMovie, deleteMovie } = require('../controllers/movies');
 
-// const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([\da-z\.]{2,6})([\/\d\w\.-]*)*\/?$/i;
+// проверить регулярки
+const regexURL = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
+const regexLangRu = /^[а-яё -]+$/i;
+const regexLangEn = /^[a-z]+$/i;
 
 // Получаем сохраненные фильмы пользователя
-router.get('/', getUserMovies);
+router.get('/movies/', getUserMovies);
 
 // Сохраняем фильм в локальную базу
-router.post('/', saveMovie);
+router.post(
+  '/movies/',
+  celebrate({
+    body: Joi.object().keys({
+      country: Joi.string().required(),
+      director: Joi.string().required(),
+      duration: Joi.number().required(),
+      year: Joi.string().required(),
+      description: Joi.string().required(),
+      image: Joi.string().required().pattern(regexURL),
+      trailerLink: Joi.string().required().pattern(regexURL),
+      thumbnail: Joi.string().required().pattern(regexURL),
+      movieId: Joi.number().required(),
+      nameRU: Joi.string().required().pattern(regexLangRu),
+      nameEN: Joi.string().required().pattern(regexLangEn),
+    }),
+  }),
+  saveMovie,
+);
 
 // Удаление фильма по id
-router.delete('/:id',
-// celebrate({
-//   params: Joi.object().keys({
-//     id: Joi.string().length(24).hex().required(),
-//   }),
-// }),
-deleteMovie);
-
-
-
-
-
-
-
-
-// // Добавляем карточку
-// router.post('/', celebrate({
-//   body: Joi.object().keys({
-//     name: Joi.string().min(2).max(30).required(),
-//     link: Joi.string().pattern(urlPattern).required(),
-//   }),
-// }), addCard);
-// // Удаление карточки по ID
-// router.delete('/:id', celebrate({
-//   params: Joi.object().keys({
-//     id: Joi.string().length(24).hex().required(),
-//   }),
-// }), deleteCard);
-// // поставить лайк карточке
-// router.put('/:cardId/likes', celebrate({
-//   params: Joi.object().keys({
-//     cardId: Joi.string().length(24).hex().required(),
-//   }),
-// }), addLike);
-// // убрать лайк с карточки
-// router.delete('/:cardId/likes', celebrate({
-//   params: Joi.object().keys({
-//     cardId: Joi.string().length(24).hex().required(),
-//   }),
-// }), deleteLike);
+router.delete(
+  '/movies/:id',
+  celebrate({
+    params: Joi.object().keys({
+      id: Joi.string().length(24).hex().required(),
+    }),
+  }),
+  deleteMovie,
+);
 
 module.exports = router;

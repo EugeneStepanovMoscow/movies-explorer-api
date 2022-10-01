@@ -22,40 +22,34 @@ const movieSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // проверить на запись как URl
   image: {
     type: String,
     required: true,
   },
-  // проверить на запись как URl
   trailerLink: {
     type: String,
     required: true,
   },
-  // проверить на запись как URl
   thumbnail: {
     type: String,
     required: true,
   },
-  // проверить поле ref
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
-  // проверить поле ref
-  // movieId: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   required: true,
-  // },
-  // прверить на кирилицу
+  movieId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
   nameRU: {
     type: String,
     required: true,
   },
-  // проверить на латиницу
   nameEN: {
     type: String,
     required: true,
   },
 });
+
 module.exports = mongoose.model('Movie', movieSchema);

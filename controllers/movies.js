@@ -1,27 +1,23 @@
 // подключение модели
+const pc = require('picocolors');
+const mongoose = require('mongoose');
 const Movie = require('../models/movie');
 // подключение ошибок
-const ConflictError = require('../errors/conflictError');
 const DataError = require('../errors/dataError');
 const NotFoundError = require('../errors/notFoundError');
-const UnauthorizedError = require('../errors/unauthorizedError');
-const ForbiddenError = require('../errors/forbiddenError')
-
-const pc = require('picocolors');
+const ForbiddenError = require('../errors/forbiddenError');
 
 // получение списка фильма пользователя
 module.exports.getUserMovies = (req, res, next) => {
   const owner = req.user._id;
-  Movie.find({ owner: owner })
+  Movie.find({ owner })
     .then((movieFromDB) => {
-      res.status(201).send(movieFromDB)
-      console.log(`${pc.yellow('У пользователя сохранено всего:')} ${pc.red(movieFromDB.length)} ${pc.yellow(movieFromDB.length > 1 ? 'фильма' : 'фильм')}`)
+      res.status(201).send(movieFromDB);
     })
-
-}
+    .catch(next);
+};
 
 // сохранение фильма в список пользователя
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Проверить ID работает неправильно
 module.exports.saveMovie = (req, res, next) => {
   const {
     country,
@@ -32,9 +28,9 @@ module.exports.saveMovie = (req, res, next) => {
     image,
     trailerLink,
     thumbnail,
-    //movieId,
+    movieId,
     nameRU,
-    nameEN
+    nameEN,
   } = req.body;
 
   const owner = req.user._id;
@@ -49,16 +45,15 @@ module.exports.saveMovie = (req, res, next) => {
     trailerLink,
     thumbnail,
     owner,
-    //movieId,
+    movieId: mongoose.Types.ObjectId(movieId),
     nameRU,
-    nameEN
+    nameEN,
   })
-  .then((movieFromDB) => res.status(201).send({ message: `Фильм -= ${movieFromDB.nameRU} =- создан`}))
-  .catch(next)
-   console.log(pc.yellow(`Фильм сохранен пользователем`));
+    .then((movieFromDB) => res.status(201).send({ message: `Фильм -= ${movieFromDB.nameRU} =- создан` }))
+    .catch(next);
 };
 
-//удаление фильма из списка пользователя
+// удаление фильма из списка пользователя
 module.exports.deleteMovie = (req, res, next) => {
   Movie.findById(req.params.id)
     .then((movie) => {
@@ -69,9 +64,8 @@ module.exports.deleteMovie = (req, res, next) => {
         throw new ForbiddenError(pc.red('Нет прав для удаления фильма'));
       }
       Movie.findByIdAndDelete(req.params.id)
-        .then((movie) => {
-          res.status(200).send({ message: `Фильм: ${movie.nameRU} удален` })
-          console.log(pc.yellow(pc.red(`Фильм удален пользователем`)))
+        .then((deletedMovie) => {
+          res.status(200).send({ message: `Фильм: ${deletedMovie.nameRU} удален` });
         })
         .catch((err) => {
           if (err.name === 'CastError') {

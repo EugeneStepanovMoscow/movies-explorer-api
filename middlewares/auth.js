@@ -1,28 +1,28 @@
 const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser');
-const UnauthorizedError = require('../errors/unauthorizedError');
+require('dotenv').config();
 const pc = require('picocolors');
+const UnauthorizedError = require('../errors/unauthorizedError');
 
-const { JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.authCheck = (req, res, next) => {
   const { cookies } = req;
+  // проверка на наличие токена в запросе
   if (!cookies.jwt) {
-    throw new UnauthorizedError(pc.red('Токен не найден'));
+    next(new UnauthorizedError(pc.red('Токен не найден')));
+    return;
   }
+
   const token = cookies.jwt;
-  if (token) {
-    jwt.verify(token, JWT_SECRET, (err, decodet) => {
-      if (err) {
-        throw new UnauthorizedError(pc.red('Ошибка токена'));
-      }
-      req.user = {
-        _id: decodet.id,
-      };
-      return req.user;
-    });
-  } else {
-    throw new UnauthorizedError(pc.red('Ошибка авторизации общая'));
+  let payload;
+  try {
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'SECRET_KEY');
+  } catch (err) {
+    next(new UnauthorizedError('Ошибка верификации токена'));
+    return;
   }
+  req.user = {
+    _id: payload.id,
+  };
   next();
 };
