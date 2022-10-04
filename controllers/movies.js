@@ -1,11 +1,12 @@
 // подключение модели
-const pc = require('picocolors');
 const mongoose = require('mongoose');
 const Movie = require('../models/movie');
 // подключение ошибок
 const DataError = require('../errors/dataError');
 const NotFoundError = require('../errors/notFoundError');
 const ForbiddenError = require('../errors/forbiddenError');
+// сообщения ответов и ошибок
+const msg = require('../messages/messages');
 
 // получение списка фильма пользователя
 module.exports.getUserMovies = (req, res, next) => {
@@ -49,7 +50,7 @@ module.exports.saveMovie = (req, res, next) => {
     nameRU,
     nameEN,
   })
-    .then((movieFromDB) => res.status(201).send({ message: `Фильм -= ${movieFromDB.nameRU} =- создан` }))
+    .then(res.status(201).send({ message: msg.createMovie }))
     .catch(next);
 };
 
@@ -58,18 +59,16 @@ module.exports.deleteMovie = (req, res, next) => {
   Movie.findById(req.params.id)
     .then((movie) => {
       if (!movie) {
-        throw new NotFoundError(pc.red('Фильм не найден'));
+        throw new NotFoundError(msg.notFoundFilm);
       }
       if (!(movie.owner._id.toString() === req.user._id)) {
-        throw new ForbiddenError(pc.red('Нет прав для удаления фильма'));
+        throw new ForbiddenError(msg.noRights);
       }
       Movie.findByIdAndDelete(req.params.id)
-        .then((deletedMovie) => {
-          res.status(200).send({ message: `Фильм: ${deletedMovie.nameRU} удален` });
-        })
+        .then(res.status(200).send({ message: msg.deleteMovie }))
         .catch((err) => {
           if (err.name === 'CastError') {
-            next(new DataError(pc.red('Введите корректные данные')));
+            next(new DataError(msg.uncorrectData));
           } else {
             next(err);
           }
@@ -77,7 +76,7 @@ module.exports.deleteMovie = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new DataError(pc.red('Введите корректные данные')));
+        next(new DataError(msg.uncorrectData));
       } else {
         next(err);
       }

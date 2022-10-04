@@ -1,24 +1,27 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const pc = require('picocolors');
 const UnauthorizedError = require('../errors/unauthorizedError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
+
+// сообщения ответов и ошибок
+const msg = require('../messages/messages');
+const config = require('../config/config');
 
 module.exports.authCheck = (req, res, next) => {
   const { cookies } = req;
   // проверка на наличие токена в запросе
   if (!cookies.jwt) {
-    next(new UnauthorizedError(pc.red('Токен не найден')));
+    next(new UnauthorizedError(msg.notFoundToken));
     return;
   }
 
   const token = cookies.jwt;
   let payload;
   try {
-    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'SECRET_KEY');
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : config.secretKey);
   } catch (err) {
-    next(new UnauthorizedError('Ошибка верификации токена'));
+    next(new UnauthorizedError(msg.tokenVerification));
     return;
   }
   req.user = {

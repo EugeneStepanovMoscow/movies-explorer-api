@@ -10,10 +10,9 @@ const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 // const corsUnit = require('cors');
 const cookieParser = require('cookie-parser');
-const pc = require('picocolors');
 
-// подключение роутов
 const helmet = require('helmet');
+// подключение роутов
 const routerUsers = require('./routes/users');
 const routerMovies = require('./routes/movies');
 const routerSignup = require('./routes/signup');
@@ -30,17 +29,20 @@ const { PORT = 3000, DB_ADDRESS, NODE_ENV } = process.env;
 // ограничитель количества запросов с одного IP
 const limiter = require('./modules/limiter');
 
-mongoose.connect(NODE_ENV === 'production' ? DB_ADDRESS : 'mongodb://localhost:27017/bitfilmsdb', {
+const config = require('./config/config');
+
+mongoose.connect(NODE_ENV === 'production' ? DB_ADDRESS : config.dbAddress, {
   useNewUrlParser: true,
 });
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(requestLogger);
 app.use(limiter);
 app.use(helmet());
 app.use(cookieParser());
-app.use(requestLogger);
+
 // РОУТЫ
 // создание пользователя в базе;
 app.use(routerSignup);
@@ -64,5 +66,5 @@ app.use(errors());
 app.use(errorsCheck);
 
 app.listen(PORT, () => {
-  console.log(pc.yellow('Сервер запущен'));
+  // console.log('Сервер запущен');
 });

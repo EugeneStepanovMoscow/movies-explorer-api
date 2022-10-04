@@ -1,8 +1,9 @@
 const router = require('express').Router();
+// сообщения ответов и ошибок
+const msg = require('../messages/messages');
 
 router.delete('/signout', (req, res) => {
-  // console.log(pc.yellow('Токен удален'));
-  res.clearCookie('jwt').send({ message: 'Вы вышли из приложения, токен удален' });
+  res.clearCookie('jwt').send({ message: msg.appExit });
 });
 
 module.exports = router;
