@@ -8,11 +8,11 @@ const { getUserMovies, saveMovie, deleteMovie } = require('../controllers/movies
 const regexConst = require('../config/regexp');
 
 // Получаем сохраненные фильмы пользователя
-router.get('/movies/', getUserMovies);
+router.get('/', getUserMovies);
 
 // Сохраняем фильм в локальную базу
 router.post(
-  '/movies/',
+  '/',
   celebrate({
     body: Joi.object().keys({
       country: Joi.string().required(),
@@ -33,7 +33,7 @@ router.post(
 
 // Удаление фильма по id
 router.delete(
-  '/movies/:id',
+  '/:id',
   celebrate({
     params: Joi.object().keys({
       id: Joi.string().length(24).hex().required(),

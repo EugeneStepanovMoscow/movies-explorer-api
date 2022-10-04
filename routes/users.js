@@ -3,11 +3,11 @@ const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const { getRegisteredUser, userUpdate } = require('../controllers/users');
 
-router.get('/users/me', getRegisteredUser);
+router.get('/me', getRegisteredUser);
 
 // обновление профиля
 router.patch(
-  '/users/me',
+  '/me',
   celebrate({
     body: Joi.object().keys({
       email: Joi.string().required().email(),

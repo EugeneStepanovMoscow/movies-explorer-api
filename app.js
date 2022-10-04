@@ -13,15 +13,9 @@ const cookieParser = require('cookie-parser');
 
 const helmet = require('helmet');
 // подключение роутов
-const routerUsers = require('./routes/users');
-const routerMovies = require('./routes/movies');
-const routerSignup = require('./routes/signup');
-const routerSignin = require('./routes/signin');
-const routerSignout = require('./routes/signout');
-const routerDefault = require('./routes/default');
+const allRoutes = require('./routes/index');
 
 // Middlewares
-const { authCheck } = require('./middlewares/auth');
 const { errorsCheck } = require('./middlewares/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 // присваиваем номер порта из окружения или 3000 по умолчанию
@@ -44,19 +38,7 @@ app.use(helmet());
 app.use(cookieParser());
 
 // РОУТЫ
-// создание пользователя в базе;
-app.use(routerSignup);
-// вход зарегистированног пользователя
-app.use(routerSignin);
-// проверка авторизации пользователя
-app.use(authCheck);
-// выход пользователя
-app.use(routerSignout);
-// роуты пользователя и фильма
-app.use(routerUsers);
-app.use(routerMovies);
-// роут поумолчанию
-app.use(routerDefault);
+app.use(allRoutes);
 
 // запись ошибок в лог
 app.use(errorLogger);
@@ -66,5 +48,5 @@ app.use(errors());
 app.use(errorsCheck);
 
 app.listen(PORT, () => {
-  // console.log('Сервер запущен');
+  console.log('Сервер запущен');
 });
