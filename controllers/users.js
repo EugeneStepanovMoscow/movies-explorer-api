@@ -10,7 +10,8 @@ const DataError = require('../errors/dataError');
 const NotFoundError = require('../errors/notFoundError');
 const UnauthorizedError = require('../errors/unauthorizedError');
 // ключ токена из .env
-const { JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
+const config = require('../config/config');
 // срок токена (задать 1 час)
 const jwtLifeTime = '1d';
 // сообщения ответов и ошибок
@@ -50,7 +51,7 @@ module.exports.login = (req, res, next) => {
           if (!isValid) {
             throw new UnauthorizedError(msg.uncorrectPassword);
           } else {
-            const token = jwt.sign({ id: userFromDB._id }, JWT_SECRET, { expiresIn: jwtLifeTime });
+            const token = jwt.sign({ id: userFromDB._id }, NODE_ENV === 'production' ? JWT_SECRET : config.secretKey, { expiresIn: jwtLifeTime });
             return res.status(200).cookie('jwt', token).send({ message: msg.login });
           }
         })

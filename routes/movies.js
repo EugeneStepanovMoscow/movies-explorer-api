@@ -1,7 +1,9 @@
 const router = require('express').Router();
+const validator = require('validator');
+const { celebrate, Joi } = require('celebrate');
+const msg = require('../messages/messages');
 
 // подключение
-const { celebrate, Joi } = require('celebrate');
 const { getUserMovies, saveMovie, deleteMovie } = require('../controllers/movies');
 
 // проверить регулярки
@@ -20,9 +22,24 @@ router.post(
       duration: Joi.number().required(),
       year: Joi.string().required(),
       description: Joi.string().required(),
-      image: Joi.string().required().pattern(regexConst.url),
-      trailerLink: Joi.string().required().pattern(regexConst.url),
-      thumbnail: Joi.string().required().pattern(regexConst.url),
+      image: Joi.string().required().custom((v, helpers) => {
+        if (validator.isURL(v)) {
+          return v;
+        }
+        return helpers.message(msg.uncorrectURL);
+      }),
+      trailerLink: Joi.string().required().custom((v, helpers) => {
+        if (validator.isURL(v)) {
+          return v;
+        }
+        return helpers.message(msg.uncorrectURL);
+      }),
+      thumbnail: Joi.string().required().custom((v, helpers) => {
+        if (validator.isURL(v)) {
+          return v;
+        }
+        return helpers.message(msg.uncorrectURL);
+      }),
       movieId: Joi.number().required(),
       nameRU: Joi.string().required().pattern(regexConst.langRu),
       nameEN: Joi.string().required().pattern(regexConst.langEn),
