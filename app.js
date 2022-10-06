@@ -48,5 +48,5 @@ app.use(errors());
 app.use(errorsCheck);
 
 app.listen(PORT, () => {
-  // console.log('Сервер запущен');
+  //console.log('Сервер запущен');
 });
