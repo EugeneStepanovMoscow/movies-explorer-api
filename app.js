@@ -15,6 +15,8 @@ const helmet = require('helmet');
 // подключение роутов
 const allRoutes = require('./routes/index');
 
+const corsUnit = require('cors');
+
 // Middlewares
 const { errorsCheck } = require('./middlewares/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -30,7 +32,7 @@ mongoose.connect(NODE_ENV === 'production' ? DB_ADDRESS : config.dbAddress, {
 });
 
 const app = express();
-
+app.use(corsUnit());
 app.use(bodyParser.json());
 app.use(requestLogger);
 app.use(limiter);
