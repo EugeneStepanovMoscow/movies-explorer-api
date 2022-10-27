@@ -52,7 +52,8 @@ module.exports.login = (req, res, next) => {
             throw new UnauthorizedError(msg.uncorrectPassword);
           } else {
             const token = jwt.sign({ id: userFromDB._id }, NODE_ENV === 'production' ? JWT_SECRET : config.secretKey, { expiresIn: jwtLifeTime });
-            return res.status(200).cookie('jwt', token).send({ message: msg.login });
+            return res.status(200).send({ token });
+            // return res.status(200).cookie('jwt', token).send({ message: msg.login });
           }
         })
         .catch(next);
@@ -64,7 +65,6 @@ module.exports.login = (req, res, next) => {
 module.exports.getRegisteredUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((dataFromDB) => {
-      // console.log(pc.yellow(dataFromDB));
       res.status(200).send(dataFromDB);
     })
     .catch(next);

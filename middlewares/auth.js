@@ -9,14 +9,15 @@ const msg = require('../messages/messages');
 const config = require('../config/config');
 
 module.exports.authCheck = (req, res, next) => {
-  const { cookies } = req;
+  const token = req.headers.authorization;
+
   // проверка на наличие токена в запросе
-  if (!cookies.jwt) {
+  if (!token) {
     next(new UnauthorizedError(msg.notFoundToken));
     return;
   }
 
-  const token = cookies.jwt;
+  // const token = cookies.jwt;
   let payload;
   try {
     payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : config.secretKey);
