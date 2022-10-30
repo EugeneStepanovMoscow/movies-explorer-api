@@ -41,8 +41,10 @@ router.post(
         return helpers.message(msg.uncorrectURL);
       }),
       movieId: Joi.number().required(),
-      nameRU: Joi.string().required().pattern(regexConst.langRu),
-      nameEN: Joi.string().required().pattern(regexConst.langEn),
+      nameRU: Joi.string().required(),
+      nameEN: Joi.string().required(),
+      // nameRU: Joi.string().required().pattern(regexConst.langRu),
+      // nameEN: Joi.string().required().pattern(regexConst.langEn),
     }),
   }),
   saveMovie,

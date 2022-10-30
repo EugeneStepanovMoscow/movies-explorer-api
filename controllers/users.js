@@ -52,7 +52,7 @@ module.exports.login = (req, res, next) => {
             throw new UnauthorizedError(msg.uncorrectPassword);
           } else {
             const token = jwt.sign({ id: userFromDB._id }, NODE_ENV === 'production' ? JWT_SECRET : config.secretKey, { expiresIn: jwtLifeTime });
-            return res.status(200).send({ token });
+            return res.status(200).send({ token, userFromDB });
             // return res.status(200).cookie('jwt', token).send({ message: msg.login });
           }
         })
