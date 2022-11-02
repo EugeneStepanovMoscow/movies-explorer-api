@@ -10,7 +10,6 @@ const config = require('../config/config');
 
 module.exports.authCheck = (req, res, next) => {
   const token = req.headers.authorization;
-
   // проверка на наличие токена в запросе
   if (!token) {
     next(new UnauthorizedError(msg.notFoundToken));

@@ -65,7 +65,7 @@ module.exports.login = (req, res, next) => {
 module.exports.getRegisteredUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((dataFromDB) => {
-      res.status(200).send(dataFromDB);
+      res.status(200).send({ dataFromDB });
     })
     .catch(next);
 };
@@ -87,7 +87,7 @@ module.exports.userUpdate = (req, res, next) => {
       if (!user) {
         throw new NotFoundError(msg.notFoundUser);
       }
-      res.send({ message: msg.update });
+      res.send({ message: msg.update, user: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

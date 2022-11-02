@@ -46,11 +46,12 @@ module.exports.saveMovie = (req, res, next) => {
     trailerLink,
     thumbnail,
     owner,
-    movieId: mongoose.Types.ObjectId(movieId),
+    movieId,
+    // movieId: mongoose.Types.ObjectId(movieId),
     nameRU,
     nameEN,
   })
-    .then(res.status(201).send({ message: msg.createMovie }))
+    .then((movie) => res.status(201).send(movie))
     .catch(next);
 };
 
